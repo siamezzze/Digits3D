@@ -6,7 +6,7 @@ from sklearn.decomposition import PCA
 from sklearn.cluster import KMeans
 import os.path
 import random
-VISUALISE = False
+VISUALISE = True
 
 
 def is_corner(p0, p1, p2):
@@ -80,6 +80,14 @@ for digit in range(10):
         kmeans = KMeans(n_clusters=16).fit(stroke_2d)
         stroke_reduced = kmeans.cluster_centers_
 
+        # Now we have fixed amount of points, but we have lost ordering. Let's restore it.
+        belongs_to = kmeans.predict(stroke_2d)
+        min_point = [0 for _ in range(stroke_reduced.shape[0])]
+        for j in range(stroke_2d.shape[0] - 1, -1, -1):
+            min_point[belongs_to[j]] = j
+        ordering = np.argsort(min_point)
+        stroke_reduced = stroke_reduced[ordering]
+
         # Visualisation
         if VISUALISE:
             mins = np.amin(stroke_2d, axis=0)
@@ -91,6 +99,6 @@ for digit in range(10):
 
             for j in range(stroke_reduced.shape[0]):
                 px = stroke_reduced[j, :]
-                canvas[int(px[0]), int(px[1])] = 255
+                canvas[int(px[0]), int(px[1])] = 255 - 5 * j
 
             plt.imsave(os.path.join("kmeans", "digit_" + str(digit) + "_" + str(i + 1) + ".png"), canvas, cmap='Greys')

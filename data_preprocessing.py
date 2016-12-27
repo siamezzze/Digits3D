@@ -6,6 +6,7 @@ from sklearn.decomposition import PCA
 from sklearn.cluster import KMeans
 import os.path
 import random
+VISUALISE = False
 
 
 def is_corner(p0, p1, p2):
@@ -57,16 +58,17 @@ for digit in range(10):
         stroke_2d -= mins
         strokes_2d[digit].append(stroke_2d)
 
-        lengths = maxs - mins + 2
-        lengths = lengths.astype(int)
-        canvas = np.zeros(lengths, dtype=np.uint8)
+        if VISUALISE:
+            lengths = maxs - mins + 2
+            lengths = lengths.astype(int)
+            canvas = np.zeros(lengths, dtype=np.uint8)
 
-        for j in range(stroke_2d.shape[0]):
-            px = stroke_2d[j, :]
-            canvas[int(px[0]), int(px[1])] = 255
+            for j in range(stroke_2d.shape[0]):
+                px = stroke_2d[j, :]
+                canvas[int(px[0]), int(px[1])] = 255
 
-        canvas_2d[digit].append(canvas)
-        # plt.imsave(os.path.join("vis", "digit_" + str(digit) + "_" + str(i + 1) + ".png"), canvas, cmap='Greys')
+            canvas_2d[digit].append(canvas)
+            plt.imsave(os.path.join("vis", "digit_" + str(digit) + "_" + str(i + 1) + ".png"), canvas, cmap='Greys')
 
 eps = 1e-2
 for digit in range(10):
@@ -79,15 +81,16 @@ for digit in range(10):
         stroke_reduced = kmeans.cluster_centers_
 
         # Visualisation
-        mins = np.amin(stroke_2d, axis=0)
-        maxs = np.amax(stroke_2d, axis=0)
+        if VISUALISE:
+            mins = np.amin(stroke_2d, axis=0)
+            maxs = np.amax(stroke_2d, axis=0)
 
-        lengths = maxs - mins + 2
-        lengths = lengths.astype(int)
-        canvas = np.zeros(lengths, dtype=np.uint8)
+            lengths = maxs - mins + 2
+            lengths = lengths.astype(int)
+            canvas = np.zeros(lengths, dtype=np.uint8)
 
-        for j in range(stroke_reduced.shape[0]):
-            px = stroke_reduced[j, :]
-            canvas[int(px[0]), int(px[1])] = 255
+            for j in range(stroke_reduced.shape[0]):
+                px = stroke_reduced[j, :]
+                canvas[int(px[0]), int(px[1])] = 255
 
-        plt.imsave(os.path.join("kmeans", "digit_" + str(digit) + "_" + str(i + 1) + ".png"), canvas, cmap='Greys')
+            plt.imsave(os.path.join("kmeans", "digit_" + str(digit) + "_" + str(i + 1) + ".png"), canvas, cmap='Greys')

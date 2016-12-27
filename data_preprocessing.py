@@ -4,6 +4,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 from sklearn.decomposition import PCA
 from sklearn.cluster import KMeans
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.metrics import confusion_matrix
 import os.path
 import random
 VISUALISE = False
@@ -100,8 +102,8 @@ for digit in range(10):
         center = [maxs[0] / 2, maxs[1] / 2]
         diag = np.linalg.norm(center)
         stroke_polar = []
-        for j in range(stroke_2d.shape[0]):
-            px = stroke_2d[j, :]
+        for j in range(stroke_reduced.shape[0]):
+            px = stroke_reduced[j, :]
             rho, theta = cart2pol(px[0] - center[0], px[1] - center[1])
             rho /= diag
             stroke_polar += [rho, theta]
@@ -121,3 +123,36 @@ for digit in range(10):
                 canvas[int(px[0]), int(px[1])] = 255 - 5 * j
 
             plt.imsave(os.path.join("kmeans", "digit_" + str(digit) + "_" + str(i + 1) + ".png"), canvas, cmap='Greys')
+
+k_test = 10
+test_subset = {k: random.sample(range(train_n[k]), k_test) for k in range(10)}
+
+train_X = []
+train_Y = []
+test_X = []
+test_Y = []
+for digit in range(10):
+    for j in range(len(features[digit])):
+        feature = features[digit][j]
+        if j in test_subset[digit]:
+            test_X.append(feature)
+            test_Y.append(digit)
+        else:
+            train_X.append(feature)
+            train_Y.append(digit)
+
+train_X = np.array(train_X, dtype=np.float)
+train_Y = np.array(train_Y, dtype=int)
+neighbours = KNeighborsClassifier(n_neighbors=5)
+neighbours.fit(train_X, train_Y)
+classified = neighbours.predict(test_X)
+
+cm = confusion_matrix(test_Y, classified)
+plt.imshow(cm, interpolation='nearest')
+plt.xticks(range(10))
+plt.yticks(range(10))
+plt.xlabel("Real digits")
+plt.ylabel("Predicted digits")
+plt.title("Confusion matrix")
+plt.colorbar()
+plt.show()

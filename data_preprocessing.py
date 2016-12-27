@@ -6,7 +6,7 @@ from sklearn.decomposition import PCA
 from sklearn.cluster import KMeans
 import os.path
 import random
-VISUALISE = True
+VISUALISE = False
 
 
 def is_corner(p0, p1, p2):
@@ -31,6 +31,13 @@ def number_of_corners(stroke):
         px_0 = px_1
         px_1 = px
     return corners
+
+
+# Thanks: http://stackoverflow.com/questions/20924085/python-conversion-between-coordinates
+def cart2pol(x, y):
+    rho = np.sqrt(x**2 + y**2)
+    phi = np.arctan2(y, x)
+    return rho, phi
 
 
 strokes = {k: [] for k in range(10)}
@@ -71,6 +78,7 @@ for digit in range(10):
             plt.imsave(os.path.join("vis", "digit_" + str(digit) + "_" + str(i + 1) + ".png"), canvas, cmap='Greys')
 
 eps = 1e-2
+features = {k: [] for k in range(10)}
 for digit in range(10):
     for i in range(len(strokes_2d[digit])):
         # We have a problem: different amount of points in for different letters.
@@ -87,6 +95,17 @@ for digit in range(10):
             min_point[belongs_to[j]] = j
         ordering = np.argsort(min_point)
         stroke_reduced = stroke_reduced[ordering]
+
+        maxs = np.amax(stroke_2d, axis=0)
+        center = [maxs[0] / 2, maxs[1] / 2]
+        diag = np.linalg.norm(center)
+        stroke_polar = []
+        for j in range(stroke_2d.shape[0]):
+            px = stroke_2d[j, :]
+            rho, theta = cart2pol(px[0] - center[0], px[1] - center[1])
+            rho /= diag
+            stroke_polar += [rho, theta]
+        features[digit].append(stroke_polar)
 
         # Visualisation
         if VISUALISE:

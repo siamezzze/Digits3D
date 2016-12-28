@@ -37,7 +37,6 @@ for digit = 0:9
     end
 end
 
-knn_model = fitcknn(features_matrix, answers);
 train_X = features_matrix;
 train_Y = answers;
 K = 5;

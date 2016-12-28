@@ -38,3 +38,7 @@ for digit = 0:9
 end
 
 knn_model = fitcknn(features_matrix, answers);
+train_X = features_matrix;
+train_Y = answers;
+K = 5;
+save('model.mat', 'pca_T', 'train_X', 'train_Y', 'K', 'n_anchors');

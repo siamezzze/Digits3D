@@ -4,7 +4,8 @@ conf_matrix = zeros(10);
 test_part = 70;
 
 n_validations = 10;
-K = 3;
+K = 5;
+accuracy = zeros(n_validations, 1);
 for i = 1:n_validations
     val_idxs = randsample(n, test_part);
     train_idxs = setdiff(1:n, val_idxs);
@@ -26,8 +27,10 @@ for i = 1:n_validations
         conf_matrix(y_pred + 1, label + 1) = conf_matrix(y_pred + 1, label + 1) + 1;
     end
     
-    accuracy = double(sum(val_Y_part == val_Y_predicted)) / n_val;
-    fprintf('%i. Accuracy = %f\n', i, accuracy);
+    accuracy(i) = double(sum(val_Y_part == val_Y_predicted)) / n_val;
+    fprintf('%i. Accuracy = %f\n', i, accuracy(i));
 end
 disp('Confusion matrix:');
 disp(conf_matrix);
+disp('Average accuracy:');
+disp(mean(accuracy));

@@ -28,12 +28,9 @@ function [ features ] = get_features( stroke_3d, pca_T, n_anchors)
     mins = min(anchors);
     lengths = maxs - mins;
     center = mins + lengths / 2;
-    for i = 1:n_anchors
-        anchors(i, :) = anchors(i, :) - center;
-    end;
-    diag = sqrt(lengths(1) * lengths(1) + lengths(2) * lengths(2));
-    maxtheta = pi * 2;
-    [theta, rho] = cart2pol(anchors(:, 1), anchors(:, 2));
+    diag = sqrt(lengths(1) * lengths(1) + lengths(2) * lengths(2)) / 2;
+    maxtheta = pi;
+    [theta, rho] = cart2pol(anchors(:, 1) - center(1), anchors(:, 2) - center(2));
     rho = rho / diag;
     theta = theta / maxtheta;
     features = zeros(n_anchors * 2, 1);

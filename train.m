@@ -22,7 +22,7 @@ all_points = all_points';
 pca_T = score(:, 1:2);
 % matrix of PCA transform.
 
-n_anchors = 16;
+n_anchors = 17;
 features_matrix = zeros(sum(n_strokes), 2 * n_anchors);
 answers = zeros(sum(n_strokes), 1);
 i = 1;
